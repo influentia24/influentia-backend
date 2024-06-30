@@ -12,16 +12,17 @@ module.exports.findByEmail = async (email)=>{
 module.exports.findByUserNameOrMail = async (username)=>{
     return await UserModel.findOne({ $or:[{username:username},{email:username}] });
 }
-module.exports.getUsers = async (currentPage,perPage,role,isAll)=>{
+module.exports.getUsers = async (currentPage,perPage,role,isAll,sort)=>{
     let query = {status:'active'};
+    let sortField = sort?.sortField || 'createdAt'
+    let sortOrder = sort?.sortOrder || -1;
     if(role){
         query.role = role;
     }
     if(isAll==='true'){
        return await UserModel.find(query).sort({createdAt:-1}); 
     }
-    console.log((currentPage-1)*perPage,perPage)
-    return await UserModel.find(query).skip((currentPage-1)*perPage).limit(perPage).sort({createdAt:-1});
+    return await UserModel.find(query).skip((currentPage-1)*perPage).limit(perPage).sort({[sortField]:sortOrder});
 }
 module.exports.getUsersCount = async (role,isAll)=>{
     let query = {status:'active'};

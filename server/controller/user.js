@@ -2,9 +2,9 @@ const UserDao = require('../dao/user_dao.js');
 const PortfolioDao = require('../dao/portfolio_dao.js');
 
 const getUsers = async (req, res) => {
-    const { currentPage, perPage, role, isAll } = req.query;
+    const { currentPage, perPage, role, isAll,sort } = req.query;
     try {
-        const users = await UserDao.getUsers(currentPage, perPage, role, isAll);
+        const users = await UserDao.getUsers(currentPage, perPage, role, isAll,sort);
         const usersCount = await UserDao.getUsersCount(role, isAll);
         res.status(200).json({ users, usersCount });
     } catch (error) {

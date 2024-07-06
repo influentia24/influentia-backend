@@ -41,3 +41,6 @@ module.exports.updateUser = async (userId,userData)=>{
 module.exports.deleteUser = async (userId)=>{
     return await UserModel.findByIdAndDelete(userId);
 }
+module.exports.getUserById = async (userId)=>{
+    return await UserModel.findOne({_id:userId})
+}

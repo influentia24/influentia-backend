@@ -44,3 +44,28 @@ module.exports.deleteUser = async (userId)=>{
 module.exports.getUserById = async (userId)=>{
     return await UserModel.findOne({_id:userId})
 }
+module.exports.getPortfoliosWithUserRole = async (currentPage,perPage,role)=>{
+    let query = {role:role};
+    return await UserModel.aggregate([
+        {
+            $match:query
+        },
+        {
+            $lookup:{
+                from:'portfolios',
+                localField:'portFolio',
+                foreignField:'_id',
+                as:'portFolio'
+            }
+        },
+        {
+            $unwind:'$portFolio'
+        },
+        {
+            $skip:(currentPage-1)*perPage
+        },
+        {
+            $limit:perPage
+        }
+    ]);
+}

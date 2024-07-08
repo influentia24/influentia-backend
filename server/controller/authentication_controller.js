@@ -8,16 +8,16 @@ const signup = async (req, res) => {
         console.log(req.body)
         const existingUser = await UserDao.findByUserName(username)
         if (existingUser) {
-            return res.status(400).json({ message: "user already exists" });
+            return res.status(400).json({ message: "User already exists" });
         }
-        console.log('username is unique :)')
+        console.log('Username is unique :)')
         if (password.length < 6) {
-            return res.status(400).json({ message: "password should be atleast 6 characters" });
+            return res.status(400).json({ message: "Password should be atleast 6 characters" });
         }
         console.log('password is valid :)')
         const existingEmail = await UserDao.findByEmail(email)
         if (existingEmail) {
-            return res.status(400).json({ message: "email already exists" });
+            return res.status(400).json({ message: "Email already exists" });
         }
         console.log('email is unique :)')
         const newUser = await UserDao.createUser(req.body);
@@ -35,16 +35,16 @@ const login = async (req, res) => {
         const { user, password } = req.body;
         const existingUser = await UserDao.findByUserNameOrMail(user)
         if (!existingUser) {
-            return res.status(400).json({ message: "user does not exists" });
+            return res.status(400).json({ message: "User does not exists" });
         }
         if (password !== existingUser.password) {
-            return res.status(400).json({ message: "invalid credentials" });
+            return res.status(400).json({ message: "Invalid credentials" });
         }
         const token = jwt.sign({ username: existingUser.username, id: existingUser._id }, SECRET_KEY);
         res.status(200).json({ username: existingUser.username, token: token });
 
     } catch (error) {
-        res.status(500).json({ message: "something went wrong" });
+        res.status(500).json({ message: "Something went wrong" });
         console.log(error)
     }
 }

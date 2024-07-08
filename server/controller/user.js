@@ -124,7 +124,18 @@ const getPortfolioByUserName = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 }
+const getPortfoliosWithUserRole = async (req, res) => {
+    try {
+        const role = req.params.role;
+        const currentPage = req.query.currentPage || 1;
+        const perPage = req.query.perPage || 10;
+        const portfolio = await UserDao.getPortfoliosWithUserRole(currentPage, perPage, role);
+        res.status(200).json({ portfolio });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
 
 
 
-module.exports = { getUsers, createUser, getUser, updateUser, deleteUser, addPortFolioForUser ,createPortfolio, getPortfolios, getPortfolioById, updatePortfolio, deletePortfolio, getPortfolioByUserName, getAllPortfolios};
+module.exports = { getUsers, createUser, getUser, updateUser, deleteUser, addPortFolioForUser ,createPortfolio, getPortfolios, getPortfolioById, updatePortfolio, deletePortfolio, getPortfolioByUserName, getAllPortfolios,getPortfoliosWithUserRole};

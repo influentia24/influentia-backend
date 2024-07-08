@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
-    role: { type: String, default: 'user' }, // Add a default role if necessary
+    role: { type: String, default: 'influenter' }, // Add a default role if necessary
     status: { type: String, default: 'active' },
     portfolio: { type: mongoose.Schema.Types.ObjectId, ref: 'Portfolio' },
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],

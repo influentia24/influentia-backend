@@ -20,7 +20,7 @@ module.exports.getAllPosts = async (req, res) => {
 }
 
 module.exports.getPosts = async (req, res) => {
-    const { page, perPage, userId } = req.query;
+    const { page, perPage, userId  } = req.query;
     const currentPage = parseInt(page) || 1;
     const itemsPerPage = parseInt(perPage) || 10;
 

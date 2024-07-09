@@ -15,6 +15,6 @@ routes.get('/portfolios/:niche', UserController.getPortfolios);
 routes.get('/portfolio/:id', UserController.getPortfolioById);
 routes.put('/portfolio/:id', UserController.updatePortfolio);
 routes.delete('/portfolio/:id', UserController.deletePortfolio);
-routes.get('/portfolios/:role', UserController.getPortfoliosWithUserRole);
+routes.get('/portfolios-by-role/:role', UserController.getPortfoliosWithUserRole);
 
 module.exports = routes

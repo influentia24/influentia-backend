@@ -46,6 +46,7 @@ module.exports.getUserById = async (userId)=>{
 }
 module.exports.getPortfoliosWithUserRole = async (currentPage,perPage,role)=>{
     let query = {role:role};
+    console.log(role);
     return await UserModel.aggregate([
         {
             $match:query

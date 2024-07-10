@@ -1,5 +1,6 @@
 const UserModel = require('../models/user_model.js');
 const portFolioModel = require('../models/portfolio_model.js');
+const { default: mongoose } = require('mongoose');
 module.exports.createUser =  async (userData)=>{
  return await UserModel.create(userData)
 }
@@ -33,7 +34,11 @@ module.exports.getUsersCount = async (role,isAll)=>{
     return await UserModel.countDocuments(query);
 }
 module.exports.addPortFolioForUser = async (userId,portfolioId)=>{
-    return await UserModel.findByIdAndUpdate(userId,{ portFolio:portfolioId },{ new:true });
+    const id = new mongoose.Types.ObjectId(userId);
+    console.log(id,portfolioId);
+    const user =await UserModel.find({_id:id});
+    console.log(user);
+    return await UserModel.findOneAndUpdate({_id:id},{portfolio:id},{new:true});
 }
 module.exports.updateUser = async (userId,userData)=>{
     return await UserModel.findById(userId,userData,{ new:true });

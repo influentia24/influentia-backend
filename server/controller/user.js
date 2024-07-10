@@ -63,7 +63,8 @@ const createPortfolio = async (req, res) => {
     const portfolioData = req.body;
     try {
         const portfolio = await PortfolioDao.createPortfolio(portfolioData);
-        await UserDao.addPortFolioForUser(portfolioData.userId, portfolio._id);
+        const connected = await UserDao.addPortFolioForUser(portfolioData.userId, portfolio._id);
+        console.log(portfolio,connected);
         res.status(201).json(portfolio);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -125,6 +126,7 @@ const getPortfolioByUserName = async (req, res) => {
     }
 }
 const getPortfoliosWithUserRole = async (req, res) => {
+    console.log(req.params);
     try {
         const role = req.params.role;
         const currentPage = req.query.currentPage || 1;

@@ -54,7 +54,7 @@ module.exports.getPortfoliosWithUserRole = async (currentPage,perPage,role)=>{
         {
             $lookup:{
                 from:'portfolios',
-                localField:'portFolio',
+                localField:'portfolio',
                 foreignField:'_id',
                 as:'portFolio'
             }

@@ -33,12 +33,31 @@ module.exports.getUsersCount = async (role,isAll)=>{
     
     return await UserModel.countDocuments(query);
 }
-module.exports.addPortFolioForUser = async (userId,portfolioId)=>{
-    const id = new mongoose.Types.ObjectId(userId);
-    console.log(id,portfolioId);
-    const user =await UserModel.find({_id:id});
-    console.log(user);
-    return await UserModel.findOneAndUpdate({_id:id},{portfolio:id},{new:true});
+module.exports.addPortFolioForUser = async (userId, portfolioId) => {
+    try {
+        const id = new mongoose.Types.ObjectId(userId);
+        console.log(id, portfolioId);
+
+        // Find the user by id
+        const user = await UserModel.findById(id);
+        if (!user) {
+            console.log(`User with id ${userId} not found.`);
+            return null;
+        }
+        console.log(user);
+
+        // Update the user's portfolio
+        const updatedUser = await UserModel.findOneAndUpdate(
+            { _id: id },
+            { $set: { portfolio: portfolioId } }, // Use the correct field and value
+            { new: true }
+        );
+
+        return updatedUser;
+    } catch (error) {
+        console.error(`Error updating user with id ${userId}:`, error);
+        throw error;
+    }
 }
 module.exports.updateUser = async (userId,userData)=>{
     return await UserModel.findById(userId,userData,{ new:true });

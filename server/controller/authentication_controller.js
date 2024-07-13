@@ -40,6 +40,7 @@ const login = async (req, res) => {
         if (password !== existingUser.password) {
             return res.status(400).json({ message: "Invalid credentials" });
         }
+        existingUser.password = null;
         const token = jwt.sign({ username: existingUser.username, id: existingUser._id }, SECRET_KEY);
         res.status(200).json({ user:existingUser, token: token });
 

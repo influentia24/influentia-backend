@@ -114,7 +114,7 @@ module.exports.searchUsers = async (currentPage,perPage,searchTerm, role) => {
             query.role = { $in: [role] };
         }
 
-        const users = await UserModel.find(query).skip(skipData).limit(perPage || 10).populate('portfolio'); // Populate the portfolio if necessary
+        const users = await UserModel.find(query).skip(skipData).limit(perPage || 10) // Populate the portfolio if necessary
         return users;
     } catch (error) {
         throw new Error('Error searching users: ' + error.message);

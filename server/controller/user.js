@@ -141,7 +141,7 @@ const getPortfoliosWithUserRole = async (req, res) => {
 
 const searchUsers = async (req, res) => {
     try {
-        const role = req.params.role;
+        const role = req.query.role;
         const search  = req.query.search || '';
         const currentPage = req.query.currentPage || 1;
         const perPage = req.query.perPage || 10;

@@ -94,3 +94,29 @@ module.exports.getPortfoliosWithUserRole = async (currentPage,perPage,role)=>{
         }
     ]);
 }
+module.exports.searchUsers = async (currentPage,perPage,searchTerm, role) => {
+    try {
+        const skipData = (currentPage - 1)*perPage;
+        const regex = new RegExp(searchTerm, 'i'); // Case insensitive search
+
+        // Create a base query
+        const query = {
+            $or: [
+                { username: regex },
+                { email: regex },
+                { firstName: regex },
+                { lastName: regex }
+            ],
+        };
+
+        // Add role filter if provided
+        if (role) {
+            query.role = { $in: [role] };
+        }
+
+        const users = await UserModel.find(query).skip(skipData).limit(perPage || 10).populate('portfolio'); // Populate the portfolio if necessary
+        return users;
+    } catch (error) {
+        throw new Error('Error searching users: ' + error.message);
+    }
+};

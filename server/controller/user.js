@@ -139,5 +139,17 @@ const getPortfoliosWithUserRole = async (req, res) => {
 }
 
 
+const searchUsers = async (req, res) => {
+    try {
+        const role = req.params.role;
+        const search  = req.query.search || '';
+        const currentPage = req.query.currentPage || 1;
+        const perPage = req.query.perPage || 10;
+        const users = await UserDao.searchUsers(currentPage, perPage,search, role);
+        res.status(200).json({ users });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
 
-module.exports = { getUsers, createUser, getUser, updateUser, deleteUser, addPortFolioForUser ,createPortfolio, getPortfolios, getPortfolioById, updatePortfolio, deletePortfolio, getPortfolioByUserName, getAllPortfolios,getPortfoliosWithUserRole};
+module.exports = { searchUsers, getUsers, createUser, getUser, updateUser, deleteUser, addPortFolioForUser ,createPortfolio, getPortfolios, getPortfolioById, updatePortfolio, deletePortfolio, getPortfolioByUserName, getAllPortfolios,getPortfoliosWithUserRole};

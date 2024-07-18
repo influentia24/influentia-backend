@@ -16,6 +16,6 @@ routes.get('/portfolio/:id', UserController.getPortfolioById);
 routes.put('/portfolio/:id', UserController.updatePortfolio);
 routes.delete('/portfolio/:id', UserController.deletePortfolio);
 routes.get('/portfolios-by-role/:role', UserController.getPortfoliosWithUserRole);
-routes.get('/search',UserController.searchUsers)
+routes.get('/search/:role',UserController.searchUsers)
 
 module.exports = routes

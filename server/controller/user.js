@@ -140,11 +140,14 @@ const getPortfoliosWithUserRole = async (req, res) => {
 
 
 const searchUsers = async (req, res) => {
+    console.log(req.query,req.params);
+
     try {
-        const role = req.query.role;
+        const role = req.params.role;
         const search  = req.query.search || '';
         const currentPage = req.query.currentPage || 1;
         const perPage = req.query.perPage || 10;
+        console.log(req.query);
         const users = await UserDao.searchUsers(currentPage, perPage,search, role);
         res.status(200).json({ users });
     } catch (error) {

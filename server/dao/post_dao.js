@@ -9,8 +9,14 @@ module.exports.createPost = async (postData) => {
 module.exports.getAllPosts = async () => {
     try {
         return await PostModel.find()
-            .populate('userId', 'name email') // Populate user data, selecting name and email fields
-            .populate('portfolioId', 'title description image'); // Populate portfolio data, selecting title, description, and image fields
+        .populate({
+            path: 'userId',
+            select: 'firstName lastName email portfolioId',
+            populate: {
+                path: 'portfolioId',
+                select: 'title bio image' // Select the fields you need from the Portfolio model
+            }
+        });
     } catch (error) {
         console.error('Error fetching posts:', error);
         throw error;

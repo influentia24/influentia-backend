@@ -11,9 +11,9 @@ module.exports.getAllPosts = async () => {
         return await PostModel.find()
         .populate({
             path: 'userId',
-            select: 'firstName lastName email portfolioId',
+            select: 'firstName lastName email portfolio',
             populate: {
-                path: 'portfolioId',
+                path: 'portfolio',
                 select: 'title bio image' // Select the fields you need from the Portfolio model
             }
         });

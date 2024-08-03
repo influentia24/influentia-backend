@@ -7,9 +7,15 @@ module.exports.createPost = async (postData) => {
 }
 
 module.exports.getAllPosts = async () => {
-    return await PostModel.find();
-}
-
+    try {
+        return await PostModel.find()
+            .populate('userId', 'name email') // Populate user data, selecting name and email fields
+            .populate('portfolioId', 'title description image'); // Populate portfolio data, selecting title, description, and image fields
+    } catch (error) {
+        console.error('Error fetching posts:', error);
+        throw error;
+    }
+};
 module.exports.getPosts = async (currentPage, perPage, userId) => {
     let query = {};
     if (userId) {

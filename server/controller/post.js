@@ -12,7 +12,10 @@ module.exports.createPost = async (req, res) => {
 
 module.exports.getAllPosts = async (req, res) => {
     try {
-        const posts = await postDAO.getAllPosts();
+        const currentPage = req.query.currentPage || 1;
+        const perPage = req.query.perPage || 10;
+        const role = req.query.role || null
+        const posts = await postDAO.getAllPosts(currentPage,perPage,role);
         res.status(200).json(posts);
     } catch (error) {
         res.status(500).json({ message: error.message });

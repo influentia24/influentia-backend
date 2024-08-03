@@ -5,18 +5,83 @@ const CommentModel = require('../models/comment_model');
 module.exports.createPost = async (postData) => {
     return await PostModel.create(postData);
 }
-
-module.exports.getAllPosts = async () => {
+module.exports.getAllPosts = async (currentPage = 1, perPage = 10, role) => {
     try {
-        return await PostModel.find()
-        .populate({
-            path: 'userId',
-            select: 'firstName lastName email portfolio',
-            populate: {
-                path: 'portfolio',
-                select: 'title bio image' // Select the fields you need from the Portfolio model
+        const pipeline = [
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'userId',
+                    foreignField: '_id',
+                    as: 'user'
+                }
+            },
+            {
+                $unwind: '$user'
             }
-        });
+        ];
+
+        if (role) {
+            pipeline.push({
+                $match: { 'user.role': role }
+            });
+        }
+
+        const totalPipeline = [...pipeline, { $count: 'total' }];
+        
+        const postsPipeline = [
+            ...pipeline,
+            { $skip: (currentPage - 1) * perPage },
+            { $limit: perPage },
+            {
+                $project: {
+                    title: 1,
+                    desc: 1,
+                    comments: 1,
+                    userId: 1,
+                    role: 1,
+                    image: 1,
+                    postType: 1,
+                    likes: 1,
+                    likedBy: 1,
+                    createdAt: 1,
+                    updatedAt: 1,
+                    'user.firstName': 1,
+                    'user.lastName': 1,
+                    'user.email': 1,
+                    'user.role': 1,
+                    'user.portfolio': 1
+                }
+            },
+            {
+                $lookup: {
+                    from: 'portfolios',
+                    localField: 'user.portfolio',
+                    foreignField: '_id',
+                    as: 'user.portfolio'
+                }
+            },
+            {
+                $unwind: {
+                    path: '$user.portfolio',
+                    preserveNullAndEmptyArrays: true
+                }
+            }
+        ];
+
+        const [posts, totalResult] = await Promise.all([
+            PostModel.aggregate(postsPipeline),
+            PostModel.aggregate(totalPipeline)
+        ]);
+
+        const totalPosts = totalResult.length > 0 ? totalResult[0].total : 0;
+
+        return {
+            posts,
+            totalPosts,
+            totalPages: Math.ceil(totalPosts / perPage),
+            currentPage
+        };
     } catch (error) {
         console.error('Error fetching posts:', error);
         throw error;

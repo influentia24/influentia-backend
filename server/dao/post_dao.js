@@ -34,16 +34,27 @@ module.exports.getAllPosts = async (currentPage = 1, perPage = 10, role) => {
             { $skip: (currentPage - 1) * perPage },
             { $limit: perPage },
             {
+                $addFields: {
+                    likes: { $size: '$likedBy' }  // Calculate total likes
+                }
+            },
+            {
+                $lookup: {
+                    from: 'comments',
+                    localField: '_id',
+                    foreignField: 'postId',
+                    as: 'comments'
+                }
+            },
+            {
                 $project: {
                     title: 1,
                     desc: 1,
-                    comments: 1,
+                    comments: { $size: '$comments' },  // Include the count of comments
                     userId: 1,
-                    role: 1,
                     image: 1,
                     postType: 1,
                     likes: 1,
-                    likedBy: 1,
                     createdAt: 1,
                     updatedAt: 1,
                     'user.firstName': 1,
@@ -108,9 +119,19 @@ module.exports.getPostById = async (id) => {
 }
 
 module.exports.updatePost = async (id, postData) => {
-    return await PostModel.findByIdAndUpdate(id, postData, { new: true });
-}
-
+    // Check if likedBy exists in postData and handle accordingly
+    if (postData.likedBy) {
+        // Update the post to push likedBy into the likedBy array
+        return await PostModel.findByIdAndUpdate(
+            id,
+            { $addToSet: { likedBy: { $each: postData.likedBy } }, ...postData },
+            { new: true }
+        );
+    } else {
+        // Update the post without affecting likedBy
+        return await PostModel.findByIdAndUpdate(id, postData, { new: true });
+    }
+};
 module.exports.deletePost = async (id) => {
     return await PostModel.findByIdAndDelete(id);
 }

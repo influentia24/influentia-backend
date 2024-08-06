@@ -125,3 +125,14 @@ module.exports.deleteComment = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 }
+module.exports.getSavedPosts = async (req, res) => {
+    try {
+        const currentPage = req.query.currentPage || 1;
+        const perPage = req.query.perPage || 10;
+        const userId = req.query.userId 
+        const posts = await postDAO.getSavedPosts(currentPage,perPage,userId);
+        res.status(200).json(posts);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}

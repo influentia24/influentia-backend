@@ -39,6 +39,11 @@ module.exports.getAllPosts = async (currentPage = 1, perPage = 10, role) => {
                 }
             },
             {
+                $addFields: {
+                    saves: { $size: '$savedBy' }  // Calculate total likes
+                }
+            },
+            {
                 $lookup: {
                     from: 'comments',
                     localField: '_id',
@@ -55,6 +60,7 @@ module.exports.getAllPosts = async (currentPage = 1, perPage = 10, role) => {
                     image: 1,
                     postType: 1,
                     likes: 1,
+                    saves:1,
                     createdAt: 1,
                     updatedAt: 1,
                     'user.firstName': 1,
@@ -117,21 +123,34 @@ module.exports.getPostsCount = async (userId) => {
 module.exports.getPostById = async (id) => {
     return await PostModel.findById(id);
 }
-
 module.exports.updatePost = async (id, postData) => {
-    // Check if likedBy exists in postData and handle accordingly
-    if (postData.likedBy) {
-        // Update the post to push likedBy into the likedBy array
-        return await PostModel.findByIdAndUpdate(
-            id,
-            { $addToSet: { likedBy: { $each: postData.likedBy } }, ...postData },
-            { new: true }
-        );
-    } else {
-        // Update the post without affecting likedBy
-        return await PostModel.findByIdAndUpdate(id, postData, { new: true });
+    try {
+        const updateFields = {};
+
+        // Handle likedBy field
+        if (postData.likedBy) {
+            updateFields.$addToSet = { likedBy: { $each: postData.likedBy } };
+        }
+
+        // Handle savedBy field
+        if (postData.savedBy) {
+            updateFields.$addToSet = { savedBy: { $each: postData.savedBy } };
+        }
+
+        // Handle other fields
+        Object.keys(postData).forEach(key => {
+            if (key !== 'likedBy' && key !== 'savedBy') {
+                updateFields[key] = postData[key];
+            }
+        });
+
+        return await PostModel.findByIdAndUpdate(id, updateFields, { new: true });
+    } catch (error) {
+        console.error('Error updating post:', error);
+        throw error;
     }
 };
+
 module.exports.deletePost = async (id) => {
     return await PostModel.findByIdAndDelete(id);
 }
@@ -155,3 +174,30 @@ module.exports.updateComment = async (id, commentData) => {
 module.exports.deleteComment = async (id) => {
     return await CommentModel.findByIdAndDelete(id);
 }
+
+module.exports.getSavedPosts = async (currentPage = 1, perPage = 10, userId) => {
+    try {
+        // Define the query to filter posts saved by the specific user
+        const query = userId ? { savedBy: userId } : {};
+
+        // Fetch posts with pagination and sorting
+        const posts = await PostModel.find(query)
+            .skip((currentPage - 1) * perPage)
+            .limit(perPage)
+            .sort({ createdAt: -1 });
+
+        // Optionally, you can also fetch the total count of saved posts
+        const totalPosts = await PostModel.countDocuments(query);
+
+        return {
+            posts,
+            totalPosts,
+            totalPages: Math.ceil(totalPosts / perPage),
+            currentPage
+        };
+    } catch (error) {
+        console.error('Error fetching saved posts:', error);
+        throw error;
+    }
+};
+

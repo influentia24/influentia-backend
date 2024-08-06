@@ -8,6 +8,8 @@ const postSchema = new mongoose.Schema({
     image:{type:String},
     postType:{type:String,default:'post'},
     likedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    savedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+
 
 }, { timestamps: true });
 

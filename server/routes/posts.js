@@ -13,8 +13,8 @@ routes.delete('/:id', postController.deletePost);
 
 // Comment routes
 routes.post('/comments', postController.createComment);
-routes.get('/comments/post/:postId', postController.getCommentsByPostId);
-routes.get('/comments/:id', postController.getCommentById);
+routes.get('/comments/:postId', postController.getCommentsByPostId);
+// routes.get('/comments/:id', postController.getCommentById);
 routes.put('/comments/:id', postController.updateComment);
 routes.delete('/comments/:id', postController.deleteComment);
 

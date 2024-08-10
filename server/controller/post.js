@@ -55,8 +55,8 @@ module.exports.updatePost = async (req, res) => {
         if (!post) {
             return res.status(404).json({ message: 'Post not found' });
         }
-        post.likes = post.likedBy.length;
-        post.saves = post.savedBy.length;        
+        post.likes = post.likedBy?post.likedBy.length:0;
+        post.saves = post.savedBy?post.savedBy.length:0;        
         res.status(200).json({post,message:'Post updated successfuly'});
     } catch (error) {
         res.status(500).json({ message: error.message });

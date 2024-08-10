@@ -60,6 +60,25 @@ module.exports.addPortFolioForUser = async (userId, portfolioId) => {
     }
 }
 module.exports.updateUser = async (userId,userData)=>{
+    const user = await UserModel.findById(id);
+    const updateFields = {};
+
+    if(userData.follower){
+        userData.follower.forEach(follow => {
+            if (user.followedBy.includes(follow)) {
+                // Remove follow from follower
+                updateFields.$pull = { followedBy: follow };
+            } else {
+                // Add follow to follower
+                updateFields.$addToSet = { followedBy: follow };
+            }
+        });
+    }
+    Object.keys(userData).forEach(key => {
+        if (key !== 'followedBy') {
+            updateFields[key] = userData[key];
+        }
+    });
     return await UserModel.findById(userId,userData,{ new:true });
 }
 module.exports.deleteUser = async (userId)=>{

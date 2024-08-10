@@ -1,4 +1,5 @@
 const postDAO = require('../dao/post_dao'); // Adjust the path as necessary
+const { uploadFile } = require('../helper/helper-function');
 
 
 module.exports.createPost = async (req, res) => {
@@ -54,7 +55,9 @@ module.exports.updatePost = async (req, res) => {
         if (!post) {
             return res.status(404).json({ message: 'Post not found' });
         }
-        res.status(200).json(post);
+        post.likes = post.likedBy.length;
+        post.saves = post.savedBy.length;        
+        res.status(200).json({post,message:'Post updated successfuly'});
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

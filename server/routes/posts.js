@@ -1,10 +1,12 @@
 const express = require('express');
 const routes = express.Router({ caseSensitive: true });
 const postController = require('../controller/post')
+const multer = require('multer');
+const upload = multer();
 
 
 // Post routes
-routes.post('/', postController.createPost);
+routes.post('/',upload.single('file'), postController.createPost);
 routes.get('/', postController.getAllPosts);
 routes.get('/paginated', postController.getPosts);
 routes.get('/:id', postController.getPostById);

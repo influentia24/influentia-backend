@@ -5,7 +5,7 @@ const CommentModel = require('../models/comment_model');
 module.exports.createPost = async (postData) => {
     return await PostModel.create(postData);
 }
-module.exports.getAllPosts = async (currentPage = 1, perPage = 10, role) => {
+module.exports.getAllPosts = async (currentPage = 1, perPage = 10, role, postType) => {
     try {
         const pipeline = [
             {
@@ -26,9 +26,13 @@ module.exports.getAllPosts = async (currentPage = 1, perPage = 10, role) => {
                 $match: { 'user.role': role }
             });
         }
-
+        if (postType) {
+            pipeline.push({
+                $match: { 'postType': postType }
+            })
+        }
         const totalPipeline = [...pipeline, { $count: 'total' }];
-        
+
         const postsPipeline = [
             ...pipeline,
             { $skip: (currentPage - 1) * perPage },
@@ -60,7 +64,7 @@ module.exports.getAllPosts = async (currentPage = 1, perPage = 10, role) => {
                     image: 1,
                     postType: 1,
                     likes: 1,
-                    saves:1,
+                    saves: 1,
                     createdAt: 1,
                     updatedAt: 1,
                     'user.firstName': 1,
@@ -125,16 +129,39 @@ module.exports.getPostById = async (id) => {
 }
 module.exports.updatePost = async (id, postData) => {
     try {
+        // Find the post by ID
+        const post = await PostModel.findById(id);
+
+        if (!post) {
+            throw new Error('Post not found');
+        }
+
         const updateFields = {};
 
         // Handle likedBy field
         if (postData.likedBy) {
-            updateFields.$addToSet = { likedBy: { $each: postData.likedBy } };
+            postData.likedBy.forEach(userId => {
+                if (post.likedBy.includes(userId)) {
+                    // Remove userId from likedBy
+                    updateFields.$pull = { likedBy: userId };
+                } else {
+                    // Add userId to likedBy
+                    updateFields.$addToSet = { likedBy: userId };
+                }
+            });
         }
 
         // Handle savedBy field
         if (postData.savedBy) {
-            updateFields.$addToSet = { savedBy: { $each: postData.savedBy } };
+            postData.savedBy.forEach(userId => {
+                if (post.savedBy.includes(userId)) {
+                    // Remove userId from savedBy
+                    updateFields.$pull = { savedBy: userId };
+                } else {
+                    // Add userId to savedBy
+                    updateFields.$addToSet = { savedBy: userId };
+                }
+            });
         }
 
         // Handle other fields
@@ -144,6 +171,7 @@ module.exports.updatePost = async (id, postData) => {
             }
         });
 
+        // Apply the updates to the post
         return await PostModel.findByIdAndUpdate(id, updateFields, { new: true });
     } catch (error) {
         console.error('Error updating post:', error);

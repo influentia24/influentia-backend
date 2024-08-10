@@ -8,6 +8,8 @@ const postSchema = new mongoose.Schema({
     image:{type:String},
     minPrice: { type: Number },
     maxPrice: { type: Number},
+    likes:{type : Number},
+    saves:{type:Number},
     postType:{type:String,default:'post'},
     likedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     savedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],

@@ -67,6 +67,8 @@ module.exports.getAllPosts = async (currentPage = 1, perPage = 10, role, postTyp
                     saves: 1,
                     createdAt: 1,
                     updatedAt: 1,
+                    minPrice:1,
+                    maxPrice:1,
                     'user.firstName': 1,
                     'user.lastName': 1,
                     'user.email': 1,

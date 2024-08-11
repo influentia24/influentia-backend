@@ -16,7 +16,8 @@ module.exports.getAllPosts = async (req, res) => {
         const currentPage = req.query.currentPage || 1;
         const perPage = req.query.perPage || 10;
         const role = req.query.role || null
-        const posts = await postDAO.getAllPosts(currentPage,perPage,role);
+        const postType = req.query.postType || null
+        const posts = await postDAO.getAllPosts(currentPage,perPage,role,postType);
         res.status(200).json(posts);
     } catch (error) {
         res.status(500).json({ message: error.message });

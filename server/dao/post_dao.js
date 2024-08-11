@@ -5,7 +5,7 @@ const CommentModel = require('../models/comment_model');
 module.exports.createPost = async (postData) => {
     return await PostModel.create(postData);
 }
-module.exports.getAllPosts = async (currentPage = 1, perPage = 10, role, postType) => {
+module.exports.getAllPosts = async (currentPage = 1, perPage = 10, role, postType,status) => {
     try {
         const pipeline = [
             {
@@ -29,6 +29,11 @@ module.exports.getAllPosts = async (currentPage = 1, perPage = 10, role, postTyp
         if (postType) {
             pipeline.push({
                 $match: { 'postType': postType }
+            })
+        }
+        if (status) {
+            pipeline.push({
+                $match: { 'status': status }
             })
         }
         const totalPipeline = [...pipeline, { $count: 'total' }];
@@ -65,6 +70,7 @@ module.exports.getAllPosts = async (currentPage = 1, perPage = 10, role, postTyp
                     postType: 1,
                     likes: 1,
                     saves: 1,
+                    status:1,
                     createdAt: 1,
                     updatedAt: 1,
                     minPrice:1,

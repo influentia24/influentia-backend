@@ -131,7 +131,8 @@ const getPortfoliosWithUserRole = async (req, res) => {
         const role = req.params.role;
         const currentPage = req.query.currentPage || 1;
         const perPage = req.query.perPage || 10;
-        const portfolio = await UserDao.getPortfoliosWithUserRole(currentPage, perPage, role);
+        const sortBy = req.query.sortBy || 'recent'
+        const portfolio = await UserDao.getPortfoliosWithUserRole(currentPage, perPage, role,sortBy);
         res.status(200).json({ portfolio });
     } catch (error) {
         res.status(500).json({ message: error.message });

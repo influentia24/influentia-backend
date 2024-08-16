@@ -18,7 +18,8 @@ module.exports.getAllPosts = async (req, res) => {
         const role = req.query.role || null
         const postType = req.query.postType || null
         const status = req.query.status || null
-        const posts = await postDAO.getAllPosts(currentPage, perPage, role, postType, status);
+        const sortBy = req.query.sortBy || 'recent'
+        const posts = await postDAO.getAllPosts(currentPage, perPage, role, postType, status,sortBy);
         res.status(200).json(posts);
     } catch (error) {
         res.status(500).json({ message: error.message });

@@ -5,7 +5,7 @@ const CommentModel = require('../models/comment_model');
 module.exports.createPost = async (postData) => {
     return await PostModel.create(postData);
 }
-module.exports.getAllPosts = async (currentPage = 1, perPage = 10, role, postType,status) => {
+module.exports.getAllPosts = async (currentPage = 1, perPage = 10, role, postType, status, sortBy) => {
     try {
         const pipeline = [
             {
@@ -36,6 +36,7 @@ module.exports.getAllPosts = async (currentPage = 1, perPage = 10, role, postTyp
                 $match: { 'status': status }
             })
         }
+
         const totalPipeline = [...pipeline, { $count: 'total' }];
 
         const postsPipeline = [
@@ -44,12 +45,8 @@ module.exports.getAllPosts = async (currentPage = 1, perPage = 10, role, postTyp
             { $limit: perPage },
             {
                 $addFields: {
-                    likes: { $size: '$likedBy' }  // Calculate total likes
-                }
-            },
-            {
-                $addFields: {
-                    saves: { $size: '$savedBy' }  // Calculate total likes
+                    likes: { $size: '$likedBy' },  // Calculate total likes
+                    saves: { $size: '$savedBy' }    // Calculate total saves
                 }
             },
             {
@@ -61,25 +58,8 @@ module.exports.getAllPosts = async (currentPage = 1, perPage = 10, role, postTyp
                 }
             },
             {
-                $project: {
-                    title: 1,
-                    desc: 1,
-                    comments: { $size: '$comments' },  // Include the count of comments
-                    userId: 1,
-                    image: 1,
-                    postType: 1,
-                    likes: 1,
-                    saves: 1,
-                    status:1,
-                    createdAt: 1,
-                    updatedAt: 1,
-                    minPrice:1,
-                    maxPrice:1,
-                    'user.firstName': 1,
-                    'user.lastName': 1,
-                    'user.email': 1,
-                    'user.role': 1,
-                    'user.portfolio': 1
+                $addFields: {
+                    comments: { $size: '$comments' }  // Include the count of comments
                 }
             },
             {
@@ -95,8 +75,42 @@ module.exports.getAllPosts = async (currentPage = 1, perPage = 10, role, postTyp
                     path: '$user.portfolio',
                     preserveNullAndEmptyArrays: true
                 }
+            },
+            {
+                $project: {
+                    title: 1,
+                    desc: 1,
+                    comments: 1,
+                    userId: 1,
+                    image: 1,
+                    postType: 1,
+                    likes: 1,
+                    saves: 1,
+                    status: 1,
+                    createdAt: 1,
+                    updatedAt: 1,
+                    minPrice: 1,
+                    maxPrice: 1,
+                    'user.firstName': 1,
+                    'user.lastName': 1,
+                    'user.email': 1,
+                    'user.role': 1,
+                    'user.portfolio': 1
+                }
             }
         ];
+
+        // Apply sorting based on the sortBy parameter
+        if (sortBy === 'mostLiked') {
+            postsPipeline.push({ $sort: { likes: -1 } });
+        } else if (sortBy === 'trending') {
+            // Assuming trending is based on likes and comments, adjust as needed
+            postsPipeline.push({ $sort: { likes: -1, commentsCount: -1 } });
+        } else if (sortBy === 'recent') {
+            postsPipeline.push({ $sort: { createdAt: -1 } });
+        } else if (sortBy === 'old') {
+            postsPipeline.push({ $sort: { createdAt: 1 } });
+        }
 
         const [posts, totalResult] = await Promise.all([
             PostModel.aggregate(postsPipeline),
@@ -116,6 +130,7 @@ module.exports.getAllPosts = async (currentPage = 1, perPage = 10, role, postTyp
         throw error;
     }
 };
+
 module.exports.getPosts = async (currentPage, perPage, userId) => {
     let query = {};
     if (userId) {

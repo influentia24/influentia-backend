@@ -42,17 +42,17 @@ module.exports.getUsers = async (currentPage = 1, perPage = 10, role, isAll, sor
 
         // If `isAll` is true, return all matching users without pagination
         if (isAll === 'true') {
-            return await User.find(query).sort(sortCriteria);
+            return await UserModel.find(query).sort(sortCriteria);
         }
 
         // Paginated query with sorting
-        const users = await User.find(query)
+        const users = await UserModel.find(query)
             .skip((currentPage - 1) * perPage)
             .limit(perPage)
             .sort(sortCriteria);
 
         // Get total count of matching users for pagination
-        const totalCount = await User.countDocuments(query);
+        const totalCount = await UserModel.countDocuments(query);
 
         return {
             users,

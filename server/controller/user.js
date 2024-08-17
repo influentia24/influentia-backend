@@ -32,7 +32,7 @@ const getUser = async (req, res) => {
     }
 }
 const updateUser = async (req, res) => {
-    const { userId } = req.query;
+    const { userId } = req.params.userId;
     const userData = req.body;
     try {
         const user = await UserDao.updateUser(userId, userData);

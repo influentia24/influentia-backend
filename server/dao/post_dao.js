@@ -88,6 +88,8 @@ module.exports.getAllPosts = async (currentPage = 1, perPage = 10, role, postTyp
                     saves: 1,
                     status: 1,
                     createdAt: 1,
+                    likedBy:1,
+                    savedBy:1,
                     updatedAt: 1,
                     minPrice: 1,
                     maxPrice: 1,

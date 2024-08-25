@@ -21,5 +21,6 @@ routes.get('/comments/:postId', postController.getCommentsByPostId);
 // routes.get('/comments/:id', postController.getCommentById);
 routes.put('/comments/:id', postController.updateComment);
 routes.delete('/comments/:id', postController.deleteComment);
+routes.post('/upload-image',upload.single('file'),postController.uploadImage)
 
 module.exports = routes

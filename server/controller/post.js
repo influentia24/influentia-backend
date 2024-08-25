@@ -142,3 +142,16 @@ module.exports.getSavedPosts = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 }
+
+module.exports.uploadImage = async (req,res) =>{
+    try {
+        const file = req.file;
+        let key = null;
+        if(file){
+           key = await uploadFile(file)
+        }
+        res.status(200).json(key);
+    } catch (error) {
+        res.status(500).json({message:error.message})
+    }
+}

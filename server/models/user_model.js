@@ -9,7 +9,6 @@ const userSchema = new mongoose.Schema({
     role: { type: String, default: 'influenter' }, // Add a default role if necessary
     status: { type: String, default: 'active' },
     portfolio: { type: mongoose.Schema.Types.ObjectId, ref: 'portfolio' },
-    followers: { type:String ,default:0},
     followedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },

@@ -9,6 +9,7 @@ const portfolioSchema = new mongoose.Schema({
     title: { type: String },
     bio: { type: String},
     image: { type: String },
+    banner:{ type:String },
     niche: { type: String },
     link: [LinkSchema],
     category: { type: String },

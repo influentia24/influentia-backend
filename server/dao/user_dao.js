@@ -173,7 +173,7 @@ module.exports.getPortfoliosWithUserRole = async (currentPage = 1, perPage = 10,
             { $unwind: '$portFolio' },
             {
                 $addFields: {
-                    followersCount: { $size: '$followers' }  // Calculate number of followers
+                    followersCount: { $size: '$followedBy' }  // Calculate number of followers
                 }
             },
             {

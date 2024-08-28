@@ -187,13 +187,12 @@ module.exports.getPortfoliosWithUserRole = async (currentPage = 1, perPage = 10,
         throw error;
     }
 };
-
-
-module.exports.searchUsers = async (currentPage,perPage,searchTerm, role) => {
+module.exports.searchUsers = async (currentPage, perPage, searchTerm, role, categories, minFollowers, maxFollowers, avgMinPostLikes, avgMaxPostLikes) => {
     try {
         const sanitizedSearchTerm = searchTerm.replace(/['"]/g, '');
-        const skipData = (currentPage - 1)*perPage;
+        const skipData = (currentPage - 1) * perPage;
         const regex = new RegExp(sanitizedSearchTerm, 'i'); // Case insensitive search
+
         // Create a base query
         const query = {
             $or: [
@@ -203,13 +202,55 @@ module.exports.searchUsers = async (currentPage,perPage,searchTerm, role) => {
                 { lastName: regex }
             ],
         };
+
         // Add role filter if provided
         if (role) {
             query.role = { $in: [role] };
         }
+
+        // Add categories filter if provided
+        if (categories && categories.length > 0) {
+            query.categories = { $in: categories };
+        }
+
+        // Add followers count filter if provided
+        if (minFollowers !== undefined && maxFollowers !== undefined) {
+            query.followers = { $gte: minFollowers, $lte: maxFollowers };
+        }
+
+        // Aggregate posts to calculate average likes per user
+        let userIdsWithAvgLikes = [];
+        if (avgMinPostLikes !== undefined && avgMaxPostLikes !== undefined) {
+            const usersWithAvgLikes = await Post.aggregate([
+                {
+                    $group: {
+                        _id: '$userId', // Group by userId
+                        avgLikes: { $avg: '$likes' }, // Calculate the average likes for each user
+                    }
+                },
+                {
+                    $match: {
+                        avgLikes: { $gte: avgMinPostLikes, $lte: avgMaxPostLikes } // Filter by avgMinPostLikes and avgMaxPostLikes
+                    }
+                },
+                {
+                    $project: { _id: 1 } // Only keep the userId
+                }
+            ]);
+
+            userIdsWithAvgLikes = usersWithAvgLikes.map(user => user._id);
+        }
+
+        // Add average post likes filter if provided
+        if (userIdsWithAvgLikes.length > 0) {
+            query._id = { $in: userIdsWithAvgLikes };
+        }
+
         console.log(query);
+
         const count = await UserModel.countDocuments(query);
-        const users = await UserModel.find(query).skip(skipData).limit(perPage || 10).populate('portfolio')
+        const users = await UserModel.find(query).skip(skipData).limit(perPage || 10).populate('portfolio');
+
         return { total: count, users };
     } catch (error) {
         throw new Error('Error searching users: ' + error.message);

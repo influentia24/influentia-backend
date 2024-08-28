@@ -148,8 +148,13 @@ const searchUsers = async (req, res) => {
         const search  = req.query.search || '';
         const currentPage = req.query.currentPage || 1;
         const perPage = req.query.perPage || 10;
+        const categories = req.query.categories || null
+        const minFollowers = req.query.minFollowers || 0;
+        const maxFollowers = req.query.maxFollowers
+        const avgMinPostLikes = req.query.avgMinPostLikes
+        const avgMaxPostLikes = req.query.avgMaxPostLikes
         console.log(req.query);
-        const users = await UserDao.searchUsers(currentPage, perPage,search, role);
+        const users = await UserDao.searchUsers(currentPage, perPage,search, role,categories,minFollowers,maxFollowers,avgMinPostLikes,avgMaxPostLikes);
         res.status(200).json({ users });
     } catch (error) {
         res.status(500).json({ message: error.message });

@@ -1,6 +1,7 @@
 const UserModel = require('../models/user_model.js');
 const portFolioModel = require('../models/portfolio_model.js');
 const { default: mongoose } = require('mongoose');
+const Post = require('../models/post_model.js');
 module.exports.createUser =  async (userData)=>{
  return await UserModel.create(userData)
 }
@@ -187,7 +188,8 @@ module.exports.getPortfoliosWithUserRole = async (currentPage = 1, perPage = 10,
         throw error;
     }
 };
-module.exports.searchUsers = async (currentPage, perPage, searchTerm, role, categories, minFollowers, maxFollowers, avgMinPostLikes, avgMaxPostLikes) => {
+
+module.exports.searchUsers = async (currentPage, perPage, searchTerm, role, categories, minFollowers, maxFollowers, avgMinFollowers, avgMaxFollowers, avgMinPostLikes, avgMaxPostLikes) => {
     try {
         const sanitizedSearchTerm = searchTerm.replace(/['"]/g, '');
         const skipData = (currentPage - 1) * perPage;
@@ -218,32 +220,60 @@ module.exports.searchUsers = async (currentPage, perPage, searchTerm, role, cate
             query.followers = { $gte: minFollowers, $lte: maxFollowers };
         }
 
-        // Aggregate posts to calculate average likes per user
+        // Calculate the average followers per user and filter based on avgMinFollowers and avgMaxFollowers
+        let userIdsWithAvgFollowers = [];
+        if (avgMinFollowers !== undefined && avgMaxFollowers !== undefined) {
+            const usersWithAvgFollowers = await UserModel.aggregate([
+                {
+                    $project: {
+                        _id: 1,
+                        avgFollowers: { $size: "$followedBy" } // Calculate the number of followers for each user
+                    }
+                },
+                {
+                    $match: {
+                        avgFollowers: { $gte: avgMinFollowers, $lte: avgMaxFollowers } // Filter by avgMinFollowers and avgMaxFollowers
+                    }
+                }
+            ]);
+
+            userIdsWithAvgFollowers = usersWithAvgFollowers.map(user => user._id);
+        }
+
+        // Add average followers filter if provided
+        if (userIdsWithAvgFollowers.length > 0) {
+            query._id = { $in: userIdsWithAvgFollowers };
+        }
+
+        // Aggregate posts to calculate average likes per user (if necessary)
         let userIdsWithAvgLikes = [];
         if (avgMinPostLikes !== undefined && avgMaxPostLikes !== undefined) {
             const usersWithAvgLikes = await Post.aggregate([
                 {
                     $group: {
-                        _id: '$userId', // Group by userId
-                        avgLikes: { $avg: '$likes' }, // Calculate the average likes for each user
+                        _id: '$userId',
+                        avgLikes: { $avg: '$likes' },
                     }
                 },
                 {
                     $match: {
-                        avgLikes: { $gte: avgMinPostLikes, $lte: avgMaxPostLikes } // Filter by avgMinPostLikes and avgMaxPostLikes
+                        avgLikes: { $gte: avgMinPostLikes, $lte: avgMaxPostLikes }
                     }
                 },
                 {
-                    $project: { _id: 1 } // Only keep the userId
+                    $project: { _id: 1 }
                 }
             ]);
 
             userIdsWithAvgLikes = usersWithAvgLikes.map(user => user._id);
         }
 
-        // Add average post likes filter if provided
-        if (userIdsWithAvgLikes.length > 0) {
-            query._id = { $in: userIdsWithAvgLikes };
+        // Combine userIdsWithAvgFollowers and userIdsWithAvgLikes filters
+        if (userIdsWithAvgLikes.length > 0 || userIdsWithAvgFollowers.length > 0) {
+            query._id = { $in: userIdsWithAvgLikes.length > 0 && userIdsWithAvgFollowers.length > 0
+                ? userIdsWithAvgLikes.filter(id => userIdsWithAvgFollowers.includes(id))
+                : userIdsWithAvgLikes.length > 0 ? userIdsWithAvgLikes : userIdsWithAvgFollowers
+            };
         }
 
         console.log(query);

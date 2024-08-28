@@ -149,7 +149,7 @@ const searchUsers = async (req, res) => {
         const currentPage = req.query.currentPage || 1;
         const perPage = req.query.perPage || 10;
         const categories = req.query.categories || null
-        const minFollowers = req.query.minFollowers || 0;
+        const minFollowers = req.query.minFollowers ;
         const maxFollowers = req.query.maxFollowers
         const avgMinPostLikes = req.query.avgMinPostLikes
         const avgMaxPostLikes = req.query.avgMaxPostLikes

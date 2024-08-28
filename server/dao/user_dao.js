@@ -188,12 +188,17 @@ module.exports.getPortfoliosWithUserRole = async (currentPage = 1, perPage = 10,
         throw error;
     }
 };
-
-module.exports.searchUsers = async (currentPage, perPage, searchTerm, role, categories, minFollowers, maxFollowers, avgMinFollowers, avgMaxFollowers, avgMinPostLikes, avgMaxPostLikes) => {
+module.exports.searchUsers = async (currentPage, perPage, searchTerm, role, categories, minFollowers, maxFollowers, avgMinPostLikes, avgMaxPostLikes) => {
     try {
         const sanitizedSearchTerm = searchTerm.replace(/['"]/g, '');
         const skipData = (currentPage - 1) * perPage;
         const regex = new RegExp(sanitizedSearchTerm, 'i'); // Case insensitive search
+
+        // Convert string to numbers if present
+        const minFollowersNum = minFollowers ? parseInt(minFollowers, 10) : undefined;
+        const maxFollowersNum = maxFollowers ? parseInt(maxFollowers, 10) : undefined;
+        const avgMinPostLikesNum = avgMinPostLikes ? parseInt(avgMinPostLikes, 10) : undefined;
+        const avgMaxPostLikesNum = avgMaxPostLikes ? parseInt(avgMaxPostLikes, 10) : undefined;
 
         // Create a base query
         const query = {
@@ -215,29 +220,35 @@ module.exports.searchUsers = async (currentPage, perPage, searchTerm, role, cate
             query.categories = { $in: categories };
         }
 
-        // Add followers count filter if provided
-        if (minFollowers !== undefined && maxFollowers !== undefined) {
-            query.followers = { $gte: minFollowers, $lte: maxFollowers };
-        }
-
-        // Calculate the average followers per user and filter based on avgMinFollowers and avgMaxFollowers
+        // Calculate the average followers per user and filter based on minFollowers and maxFollowers
         let userIdsWithAvgFollowers = [];
-        if (avgMinFollowers !== undefined && avgMaxFollowers !== undefined) {
+
+        if (minFollowersNum !== undefined || maxFollowersNum !== undefined) {
+            const matchFollowers = {};
+
+            if (minFollowersNum !== undefined) {
+                matchFollowers.$gte = minFollowersNum;
+            }
+            if (maxFollowersNum !== undefined) {
+                matchFollowers.$lte = maxFollowersNum;
+            }
+
             const usersWithAvgFollowers = await UserModel.aggregate([
                 {
                     $project: {
                         _id: 1,
-                        avgFollowers: { $size: "$followedBy" } // Calculate the number of followers for each user
+                        avgFollowers: { $size: { $ifNull: ["$followedBy", []] } } // Handle missing or non-array `followedBy`
                     }
                 },
                 {
                     $match: {
-                        avgFollowers: { $gte: avgMinFollowers, $lte: avgMaxFollowers } // Filter by avgMinFollowers and avgMaxFollowers
+                        avgFollowers: matchFollowers
                     }
                 }
             ]);
 
             userIdsWithAvgFollowers = usersWithAvgFollowers.map(user => user._id);
+            console.log(usersWithAvgFollowers, 'usersWithAvgFollowers', minFollowersNum, maxFollowersNum);
         }
 
         // Add average followers filter if provided
@@ -247,17 +258,26 @@ module.exports.searchUsers = async (currentPage, perPage, searchTerm, role, cate
 
         // Aggregate posts to calculate average likes per user (if necessary)
         let userIdsWithAvgLikes = [];
-        if (avgMinPostLikes !== undefined && avgMaxPostLikes !== undefined) {
+        if (avgMinPostLikesNum !== undefined || avgMaxPostLikesNum !== undefined) {
+            const matchLikes = {};
+
+            if (avgMinPostLikesNum !== undefined) {
+                matchLikes.$gte = avgMinPostLikesNum;
+            }
+            if (avgMaxPostLikesNum !== undefined) {
+                matchLikes.$lte = avgMaxPostLikesNum;
+            }
+
             const usersWithAvgLikes = await Post.aggregate([
                 {
                     $group: {
                         _id: '$userId',
-                        avgLikes: { $avg: '$likes' },
+                        avgLikes: { $avg: '$likes' }
                     }
                 },
                 {
                     $match: {
-                        avgLikes: { $gte: avgMinPostLikes, $lte: avgMaxPostLikes }
+                        avgLikes: matchLikes
                     }
                 },
                 {
@@ -270,9 +290,10 @@ module.exports.searchUsers = async (currentPage, perPage, searchTerm, role, cate
 
         // Combine userIdsWithAvgFollowers and userIdsWithAvgLikes filters
         if (userIdsWithAvgLikes.length > 0 || userIdsWithAvgFollowers.length > 0) {
-            query._id = { $in: userIdsWithAvgLikes.length > 0 && userIdsWithAvgFollowers.length > 0
-                ? userIdsWithAvgLikes.filter(id => userIdsWithAvgFollowers.includes(id))
-                : userIdsWithAvgLikes.length > 0 ? userIdsWithAvgLikes : userIdsWithAvgFollowers
+            query._id = {
+                $in: userIdsWithAvgLikes.length > 0 && userIdsWithAvgFollowers.length > 0
+                    ? userIdsWithAvgLikes.filter(id => userIdsWithAvgFollowers.includes(id))
+                    : userIdsWithAvgLikes.length > 0 ? userIdsWithAvgLikes : userIdsWithAvgFollowers
             };
         }
 

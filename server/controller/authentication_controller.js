@@ -1,6 +1,7 @@
 const UserDao = require('../dao/user_dao.js')
 const jwt = require('jsonwebtoken');
 const SECRET_KEY = process.env.SECRET_KEY;
+const passport = require('passport');
 
 const signup = async (req, res) => {
     try {
@@ -50,7 +51,34 @@ const login = async (req, res) => {
     }
 }
 
+const authGoogle = passport.authenticate('google', {
+    scope: ['profile', 'email']
+  });
+  
+
+// Middleware to handle Google OAuth callback
+const authGoogleCallback = passport.authenticate('google', {
+    failureRedirect: '/'
+});
+
+// This is the actual callback function after Google has authenticated the user
+const handleRedirect = (req, res) => {
+    // If authentication was successful, redirect to the profile page
+    res.redirect('/profile');
+};
+  
+  const getProfile = (req, res) => {
+    if (req.isAuthenticated()) {
+      res.json(req.user);
+    } else {
+      res.redirect('/');
+    }
+  };
 module.exports ={
     signup,
-    login
+    login,
+    authGoogle,
+    getProfile,
+    authGoogleCallback,
+    handleRedirect
 }

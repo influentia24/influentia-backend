@@ -1,7 +1,7 @@
 # API Documentation
 
 ## Backend URL
-Base URL: `https://influentia-backend.onrender.com`
+Base URL: `https://Infl********.com`
 
 ---
 

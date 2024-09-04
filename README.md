@@ -93,6 +93,11 @@ Base URL: `https://Infl********.com`
   - `image` (string, optional)
   - `likedBy` (array of ObjectId, optional)
   - `savedBy` (array of ObjectId, optional)
+  - `status` (string, required): Options - `active`, `inactive`
+  - `postType` (string, required): Options - `post`, `campaign`
+  - **If postType is `campaign`:**
+    - `minPrice` (number, optional)
+    - `maxPrice` (number, optional)
 
 ---
 

@@ -45,8 +45,11 @@ const userAuthentication = async function (req, res, next) {
         return res.status(401).json({ message: 'Invalid Token' })
     }
 }
-
+const generateResetToken=()=>{
+    return crypto.randomBytes(32).toString('hex');
+}
 
 module.exports = {
-    userAuthentication
+    userAuthentication,
+    generateResetToken,
 }

@@ -2,6 +2,7 @@ const UserModel = require('../models/user_model.js');
 const portFolioModel = require('../models/portfolio_model.js');
 const { default: mongoose } = require('mongoose');
 const Post = require('../models/post_model.js');
+const Token = require('../models/toke_model.js');
 module.exports.createUser =  async (userData)=>{
  return await UserModel.create(userData)
 }
@@ -307,3 +308,49 @@ module.exports.searchUsers = async (currentPage, perPage, searchTerm, role, cate
         throw new Error('Error searching users: ' + error.message);
     }
 };
+
+module.exports.storeResetToken = async (userId, resetToken, expiration) => {
+    try {
+      tokenObj = {
+        token: resetToken,
+        userId: userId,
+        expiration: expiration,
+      }
+      const token = await Token.create(tokenObj)
+      return true;
+    } catch (error) {
+      console.error('Error storing reset token:', error);
+      return false;
+    }
+  };
+  
+module.exports.getResetTokenByToken = async(data)=>{
+    try{
+        let user = await Token.findOne({
+            token:data
+        })
+        return user
+    }catch(error){
+        throw error;
+    }
+  }
+
+module.exports.updatePassword = async(userId,newPassword)=>{
+    try{
+        const result = await UserModel.findOneAndUpdate(userId,
+            { password: newPassword },
+          );
+        return true
+    }catch(error){
+        throw error;
+    }
+  }
+
+module.exports.deleteResetTokenByToken = async(token)=>{
+    try{
+        const result = await Token.findOneAndDelete({token:token})
+        return true
+    }catch(error){
+        throw error;
+    }
+  }

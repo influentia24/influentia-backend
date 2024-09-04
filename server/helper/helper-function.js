@@ -14,6 +14,16 @@ const uploadFile = async (file) => {
     }
 };
 
+const encryptPassword = async function (password, rounds = 10) {
+    try {
+    return await bcrypt.hash(password, await bcrypt.genSalt(rounds));
+        
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 module.exports = {
-    uploadFile
+    uploadFile,
+    encryptPassword,
 }

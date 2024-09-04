@@ -113,11 +113,12 @@ const handleRedirect = (req, res) => {
 
       const resetLink = `${process.env.SERVER_BASE_URL}admin/reset-password?token=${resetToken}`;
       let  template = await passwordResetLinkTemplate(resetLink,userName)
+      console.log(resetLink);
       
    if (await storeResetToken(user.id, resetToken, expiration)) {
       
       const mailOptions = {
-        from: CONFIG.USER_EMAIL,
+        from: process.env.USER_EMAIL,
         to: userEmail,
         subject: 'Password Reset Link',
         html: template,
@@ -130,6 +131,8 @@ const handleRedirect = (req, res) => {
   } catch (error) {
     // log('forgotPassword',error)
     // loggermail.sendLoggerMail('forgotPassword',error)
+    console.log(error);
+    
     return res.status(HTTP_STATUS.BAD_REQUEST).json({ error: MESSAGE_STATUS.ERROR });
   }
 };

@@ -154,3 +154,12 @@ Base URL: `https://Infl********.com`
   - `email` (string, required)
 
 ---
+
+### 15. Reset password
+- **Endpoint:** `/api/auth/reset-password`
+- **Method:** `Post`
+- **Body:**
+  - `token` (string, required),
+  - `password` (string, required)
+
+---

@@ -123,6 +123,15 @@ const handleRedirect = (req, res) => {
         subject: 'Password Reset Link',
         html: template,
       };
+      console.log({
+        host: process.env.HOST,
+        port: process.env.MAIL_PORT,
+        auth: {
+            user: process.env.USER_EMAIL,
+            pass: process.env.EMAIL_PASSWORD
+        }
+    },mailOptions);
+      
       await transporter.sendMail(mailOptions,);
       return res.status(HTTP_STATUS.OK).json({ message:MESSAGE_STATUS.PASSWORD_LINK_SEND_SUCCESSFULY });
     } else {

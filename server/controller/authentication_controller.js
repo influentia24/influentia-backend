@@ -123,7 +123,7 @@ const handleRedirect = (req, res) => {
         subject: 'Password Reset Link',
         html: template,
       };
-      await transporter.sendMail(mailOptions);
+      await transporter.sendMail(mailOptions,);
       return res.status(HTTP_STATUS.OK).json({ message:MESSAGE_STATUS.PASSWORD_LINK_SEND_SUCCESSFULY });
     } else {
       return res.status(HTTP_STATUS.BAD_REQUEST).json({ error: MESSAGE_STATUS.FAILED_TO_GENERATE });

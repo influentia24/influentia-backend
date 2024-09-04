@@ -328,7 +328,7 @@ module.exports.storeResetToken = async (userId, resetToken, expiration) => {
   
 module.exports.getResetTokenByToken = async(data)=>{
     try{
-        let user = await Token.findOne({
+        let user = await Token.find({
             token:data
         })
         return user

@@ -157,8 +157,8 @@ const resetPassword = async (req, res) => {
     if (!resetTokenData || Date.now() > new Date(resetTokenData.expiration).toLocaleString) {
       return res.status(HTTP_STATUS.BAD_REQUEST).json({ error: MESSAGE_STATUS.EXPIRED_LINK });
     }
-    let newPassword  = await encryptPassword(req.body.newPassword)
-    
+    // let newPassword  = await encryptPassword(req.body.newPassword)
+    let newPassword = await req.body.password;
     // Step 2: Update the user's password in the User table
     const isPasswordUpdated = await UserDao.updatePassword(resetTokenData.userId, newPassword);
 

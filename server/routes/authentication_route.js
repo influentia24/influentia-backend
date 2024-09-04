@@ -16,5 +16,7 @@ routes.get('/google/callback',
 // Profile route
 routes.get('/profile', authenticationController.getProfile);
 routes.post('/forget-password',authenticationController.forgetResetLink)
+routes.post('/reset-password',authenticationController.resetPassword)
+
 
 module.exports = routes;

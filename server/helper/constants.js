@@ -8,5 +8,6 @@ module.exports.MESSAGE_STATUS={
     PASSWORD_LINK_SEND_SUCCESSFULY:'Password reset link send successfuly.',
     FAILED_TO_GENERATE:'Failed to generate reset link',
     ERROR:'Something went wrong',
-    SUCCESSFUL:'Successful'
+    SUCCESSFUL:'Successful',
+    EXPIRED_LINK:'This link is expired.'
 }

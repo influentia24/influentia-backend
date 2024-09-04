@@ -145,3 +145,12 @@ Base URL: `https://Infl********.com`
   - **If postType is `campaign`:**
     - `minPrice` (number, optional)
     - `maxPrice` (number, optional)
+
+
+### 14. Create password reset link
+- **Endpoint:** `/api/auth/forget-password`
+- **Method:** `Post`
+- **Body:**
+  - `email` (string, required)
+
+---

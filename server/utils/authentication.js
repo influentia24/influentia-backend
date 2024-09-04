@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const UserDao = require('../dao/user_dao.js');
 const { default: mongoose } = require('mongoose');
+const crypto = require('crypto');
 
 
 const userAuthentication = async function (req, res, next) {

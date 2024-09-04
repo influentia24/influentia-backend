@@ -10,7 +10,9 @@ module.exports.findByUserName = async (username)=>{
     return await UserModel.findOne({ username });
 }
 module.exports.findByEmail = async (email)=>{
-    return await UserModel.findOne({ email });
+    console.log(email,'inside email function');
+    
+    return await UserModel.find({email:email})
 }
 module.exports.findByUserNameOrMail = async (username)=>{
     return await UserModel.findOne({ $or:[{username:username},{email:username}] });

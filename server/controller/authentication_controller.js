@@ -97,16 +97,23 @@ const handleRedirect = (req, res) => {
   const forgetResetLink = async (req, res) => {
     try {
       const userEmail = req.body.email;
+      console.log(userEmail);
+      
       const user = await UserDao.findByEmail(userEmail);
+      console.log(user);
+
       if (!user) {
         return res.status(404).json({ error: 'User not found.' });
       }
+      
       const resetToken = generateResetToken();
       const expiration = Date.now() + 3600000;
       let userName = user.firstName +" "+ user.lastName;
+      console.log(resetToken);
 
       const resetLink = `${process.env.SERVER_BASE_URL}admin/reset-password?token=${resetToken}`;
       let  template = await passwordResetLinkTemplate(resetLink,userName)
+      
    if (await storeResetToken(user.id, resetToken, expiration)) {
       
       const mailOptions = {

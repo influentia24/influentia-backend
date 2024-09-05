@@ -22,7 +22,7 @@ const passwordResetLinkTemplate = async (resetToken,userName)=>{
                      
                         <tr>
                             <td>
-                               Your one time OTP is : ${resetToken}
+                               Your one time password is : ${resetToken}
                             </td>
                         </tr>
                         <tr>

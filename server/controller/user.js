@@ -23,9 +23,11 @@ const createUser = async (req, res) => {
 }
 
 const getUser = async (req, res) => {
-    const { username } = req.params;
+    const { userId } = req.params;
+    console.log(userId);
+    
     try {
-        const user = await UserDao.findByUserName(username);
+        const user = await UserDao.findByUserName(userId);
         res.status(200).json(user);
     } catch (error) {
         res.status(500).json({ message: error.message });

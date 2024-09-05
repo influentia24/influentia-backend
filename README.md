@@ -163,3 +163,13 @@ Base URL: `https://Infl********.com`
   - `password` (string, required)
 
 ---
+
+### 16. Get profile of user by id
+- **Endpoint:** `api/users/:userId`
+- **Method:** `Get`
+- **Params:**
+  - `userId` (string, required),
+- **Example:**
+  - `api/users/668c2cf0fdeb45215d829c20` ,
+
+---

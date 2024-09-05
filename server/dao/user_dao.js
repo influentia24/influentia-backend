@@ -6,8 +6,27 @@ const Token = require('../models/toke_model.js');
 module.exports.createUser =  async (userData)=>{
  return await UserModel.create(userData)
 }
-module.exports.findByUserName = async (username)=>{
-    return await UserModel.findOne({ username });
+module.exports.findByUserName = async (userId)=>{
+    console.log(await UserModel.find({_id:userId}));
+    const objectId = new mongoose.Types.ObjectId(userId);
+
+    return await UserModel.aggregate([
+        { $match: {_id:objectId} },
+        {
+            $lookup: {
+                from: 'portfolios',
+                localField: 'portfolio',
+                foreignField: '_id',
+                as: 'portFolio'
+            }
+        },
+        { $unwind: '$portFolio' },
+        {
+            $addFields: {
+                followersCount: { $size: '$followedBy' }  // Calculate number of followers
+            }
+        }
+    ]);
 }
 module.exports.findByEmail = async (email)=>{
     console.log(email,'inside email function');

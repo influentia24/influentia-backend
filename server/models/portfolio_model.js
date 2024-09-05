@@ -12,6 +12,7 @@ const portfolioSchema = new mongoose.Schema({
     banner:{ type:String },
     niche: { type: String },
     link: [LinkSchema],
+    followers: { type:Number, default: 0 },
     category: { type: String },
     username: { type: String },
     createdAt: { type: Date, default: Date.now },

@@ -5,7 +5,7 @@ const UserController = require('../controller/user.js');
 
 routes.get('/', UserController.getUsers);
 routes.post('/', UserController.createUser);
-routes.get('/:username', UserController.getUser);
+routes.get('/:userId', UserController.getUser);
 routes.put('/:userId', UserController.updateUser);
 routes.delete('/', UserController.deleteUser);
 routes.get('/portfolio/:username', UserController.getPortfolioByUserName);

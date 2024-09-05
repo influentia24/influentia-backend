@@ -348,9 +348,13 @@ module.exports.updatePassword = async(userId,newPassword)=>{
     }
   }
 
-module.exports.deleteResetTokenByToken = async(token)=>{
+  module.exports.deleteResetTokenByToken = async(token)=>{
     try{
-        const result = await Token.findOneAndDelete({token:token})
+        const result = await Token.findOneAndDelete({ token })
+        if (!result) {
+            console.log("Token not found");
+            return false;
+        }
         return true
     }catch(error){
         throw error;

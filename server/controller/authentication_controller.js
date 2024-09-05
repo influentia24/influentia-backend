@@ -108,29 +108,20 @@ const handleRedirect = (req, res) => {
       
       const resetToken = generateResetToken();
       const expiration = Date.now() + 3600000;
-      let userName = user.firstName +" "+ user.lastName;
+      let userName = user[0]?.firstName ;
       console.log(resetToken);
 
-      const resetLink = `${process.env.SERVER_BASE_URL}admin/reset-password?token=${resetToken}`;
-      let  template = await passwordResetLinkTemplate(resetLink,userName)
-      console.log(resetLink);
+      let  template = await passwordResetLinkTemplate(resetToken,userName)
       
    if (await storeResetToken(user.id, resetToken, expiration)) {
       
       const mailOptions = {
         from: process.env.USER_EMAIL,
         to: userEmail,
-        subject: 'Password Reset Link',
+        subject: 'Password Reset OTP',
         html: template,
       };
-      console.log({
-        host: process.env.HOST,
-        port: process.env.MAIL_PORT,
-        auth: {
-            user: process.env.USER_EMAIL,
-            pass: process.env.EMAIL_PASSWORD
-        }
-    },mailOptions);
+      
       
       await transporter.sendMail(mailOptions,);
       return res.status(HTTP_STATUS.OK).json({ message:MESSAGE_STATUS.PASSWORD_LINK_SEND_SUCCESSFULY });
@@ -154,7 +145,7 @@ const resetPassword = async (req, res) => {
     resetTokenData = JSON.parse(JSON.stringify(resetTokenData))
     console.log(resetTokenData,'resterb ');
     
-    if (!resetTokenData || Date.now() > new Date(resetTokenData.expiration).toLocaleString) {
+    if (!resetTokenData || resetTokenData.length==0 || Date.now() > new Date(resetTokenData.expiration).toLocaleString) {
       return res.status(HTTP_STATUS.BAD_REQUEST).json({ error: MESSAGE_STATUS.EXPIRED_LINK });
     }
     // let newPassword  = await encryptPassword(req.body.newPassword)
@@ -163,13 +154,13 @@ const resetPassword = async (req, res) => {
     const isPasswordUpdated = await UserDao.updatePassword(resetTokenData.userId, newPassword);
 
     if (!isPasswordUpdated) {
-      return res.status(HTTP_STATUS.SERVER_ERROR).json({ error: MESSAGE_STATUS.FAILED_TO_GENERATE });
+      return res.status(HTTP_STATUS.SERVER_ERROR).json({ error: MESSAGE_STATUS.FAILED_TO_CHANGE });
     }
 
     // Step 3: Delete the used token from the ResetTokens table
     await UserDao.deleteResetTokenByToken(token);
 
-    return res.json({ message: MESSAGE_STATUS.SUCCESSFUL });
+    return res.status(HTTP_STATUS.OK).json({ message: 'Password changed successfuly' });
   } catch (error) {
 //   log('resetPassword',error)
     // loggermail.sendLoggerMail('resetPassword',error)

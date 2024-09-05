@@ -5,9 +5,11 @@ module.exports.HTTP_STATUS = {
     NOT_FOUND:404,
 }
 module.exports.MESSAGE_STATUS={
-    PASSWORD_LINK_SEND_SUCCESSFULY:'Password reset link send successfuly.',
-    FAILED_TO_GENERATE:'Failed to generate reset link',
+    PASSWORD_LINK_SEND_SUCCESSFULY:'OTP sent successfuly.',
+    FAILED_TO_GENERATE:'Failed to generate OTP',
     ERROR:'Something went wrong',
-    SUCCESSFUL:'Successful',
-    EXPIRED_LINK:'This link is expired.'
+    SUCCESSFUL:'successful',
+    EXPIRED_LINK:'This OTP is expired.',
+    FAILED_TO_CHANGE:'Failed to change password',
+
 }

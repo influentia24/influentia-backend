@@ -1,4 +1,4 @@
-const passwordResetLinkTemplate = async (resetLink,userName)=>{
+const passwordResetLinkTemplate = async (resetToken,userName)=>{
     let template = `
     <div style="background-color: #e0e1e6;padding: 20px;">
     <table style="width: 100%; margin: auto;border-spacing: 0;max-width: 600px;">
@@ -8,7 +8,7 @@ const passwordResetLinkTemplate = async (resetLink,userName)=>{
                     style=" padding: 20px; font-family: sans-serif; width: 100%;text-align: center;margin: auto;background-color: white;">
                     <tbody>
                         <tr style="text-align: center; padding: 20px 0; width: 100%; ">
-                            <td style="width: 100%; text-align: center; padding: 20px 0;"><img style="margin: auto; width: 120px;" src="" alt="logo"></td>
+                            <!-- <td style="width: 100%; text-align: center; padding: 20px 0;"><img style="margin: auto; width: 120px;" src="" alt="logo"></td> -->
                             INFLUENTIA
                        </tr>
                         <tr>
@@ -22,9 +22,7 @@ const passwordResetLinkTemplate = async (resetLink,userName)=>{
                      
                         <tr>
                             <td>
-                                <a style="background-color: #031f5b; border: none; width: 260px; height: 40px; border-radius: 5px; color: white; margin-top: 20px; padding: 12px 60px;text-decoration: none;" href="${resetLink}">
-                                        Reset Password
-                                </a>
+                               Your one time OTP is : ${resetToken}
                             </td>
                         </tr>
                         <tr>

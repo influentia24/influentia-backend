@@ -47,7 +47,7 @@ const userAuthentication = async function (req, res, next) {
     }
 }
 const generateResetToken=()=>{
-    return crypto.randomBytes(32).toString('hex');
+    return crypto.randomInt(100000, 999999);
 }
 
 module.exports = {

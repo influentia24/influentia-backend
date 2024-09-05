@@ -23,8 +23,9 @@ const signup = async (req, res) => {
         console.log('password is valid :)')
         const existingEmail = await UserDao.findByEmail(email)
         if (existingEmail) {
-            return res.status(400).json({ message: "Email already exists" });
+            return res.status(409).json({ message: "Email already exists" });
         }
+        
         console.log('email is unique :)')
         const newUser = await UserDao.createUser(req.body);
         console.log('user created :)')

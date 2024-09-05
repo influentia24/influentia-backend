@@ -90,8 +90,8 @@ module.exports.createComment = async (req, res) => {
 module.exports.getCommentsByPostId = async (req, res) => {
     try {
         const params = req.body;
-        const limit = params.limit;
-        const currPage = params.currPage;
+        const limit = params.perPage;
+        const currPage = params.currentPage;
         const comments = await postDAO.getCommentsByPostId(req.params.postId,limit,currPage);
         res.status(200).json(comments);
     } catch (error) {

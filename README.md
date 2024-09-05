@@ -114,8 +114,8 @@ Base URL: `https://Infl********.com`
 - **Endpoint:** `/api/posts/comments/:postId?currPage=1&&limit=10`
 - **Method:** `GET`
 - **Params:**
-  - `currPage` (Number, optional)
-  - `limit` (Number, optional)
+  - `currentPage` (Number, optional)
+  - `perPage` (Number, optional)
 
 
 ---

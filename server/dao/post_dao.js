@@ -212,9 +212,21 @@ module.exports.createComment = async (commentData) => {
     return await CommentModel.create(commentData);
 }
 
-module.exports.getCommentsByPostId = async (postId) => {
-    return await CommentModel.find({ postId });
-}
+module.exports.getComments = async (postId, currPage = 1, limit = 10) => {
+    try {
+      // Validate parameters if necessary
+      if (!postId) throw new Error("Post ID is required");
+  
+      return CommentModel.find({ postId })
+        .sort({ createdAt: -1 })
+        .skip((currPage - 1) * limit)
+        .limit(limit);
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+      throw error;
+    }
+};
+  
 
 module.exports.getCommentById = async (id) => {
     return await CommentModel.findById(id);

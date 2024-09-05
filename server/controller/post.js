@@ -89,7 +89,10 @@ module.exports.createComment = async (req, res) => {
 
 module.exports.getCommentsByPostId = async (req, res) => {
     try {
-        const comments = await postDAO.getCommentsByPostId(req.params.postId);
+        const params = req.body;
+        const limit = params.limit;
+        const currPage = params.currPage;
+        const comments = await postDAO.getCommentsByPostId(req.params.postId,limit,currPage);
         res.status(200).json(comments);
     } catch (error) {
         res.status(500).json({ message: error.message });

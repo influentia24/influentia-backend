@@ -111,8 +111,12 @@ Base URL: `https://Infl********.com`
 ---
 
 ### 10. Get Comments by Post ID
-- **Endpoint:** `/api/posts/comments/:postId`
+- **Endpoint:** `/api/posts/comments/:postId?currPage=1&&limit=10`
 - **Method:** `GET`
+- **Params:**
+  - `currPage` (Number, optional)
+  - `limit` (Number, optional)
+
 
 ---
 

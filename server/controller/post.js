@@ -92,7 +92,7 @@ module.exports.getCommentsByPostId = async (req, res) => {
         const params = req.body;
         const limit = params.perPage;
         const currPage = params.currentPage;
-        const comments = await postDAO.getCommentsByPostId(req.params.postId,limit,currPage);
+        const comments = await postDAO.getCommentsByPostId(req.params.postId,currPage,limit);
         res.status(200).json(comments);
     } catch (error) {
         res.status(500).json({ message: error.message });

@@ -212,7 +212,7 @@ module.exports.createComment = async (commentData) => {
     return await CommentModel.create(commentData);
 }
 
-module.exports.getComments = async (postId, currPage = 1, limit = 10) => {
+module.exports.getCommentsByPostId = async (postId, currPage = 1, limit = 10) => {
     try {
       // Validate parameters if necessary
       if (!postId) throw new Error("Post ID is required");

@@ -103,7 +103,7 @@ const handleRedirect = (req, res) => {
       const user = await UserDao.findByEmail(userEmail);
       console.log(user);
 
-      if (!user) {
+      if (!user || user.length==0) {
         return res.status(404).json({ error: 'User not found.' });
       }
       

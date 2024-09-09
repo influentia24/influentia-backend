@@ -211,21 +211,51 @@ module.exports.deletePost = async (id) => {
 module.exports.createComment = async (commentData) => {
     return await CommentModel.create(commentData);
 }
-
 module.exports.getCommentsByPostId = async (postId, currPage = 1, limit = 10) => {
     try {
-      // Validate parameters if necessary
+      // Validate parameters
       if (!postId) throw new Error("Post ID is required");
   
-      return CommentModel.find({ postId })
-        .sort({ createdAt: -1 })
-        .skip((currPage - 1) * limit)
-        .limit(limit);
+      const comments = await CommentModel.aggregate([
+        {
+          $match: { postId: postId }  // Match comments by postId
+        },
+        {
+          $lookup: {
+            from: 'users',  // Collection to join (users)
+            localField: 'userId',  // Field in CommentModel
+            foreignField: '_id',  // Field in users collection
+            as: 'user'  // Output array field containing user data
+          }
+        },
+        {
+          $unwind: '$user'  // Unwind user array to a single object
+        },
+        {
+          $sort: { createdAt: -1 }  // Sort comments by newest
+        },
+        {
+          $skip: (currPage - 1) * limit  // Skip based on pagination
+        },
+        {
+          $limit: limit  // Limit results for pagination
+        },
+        {
+          $project: {  // Optionally select specific fields to return
+            postId: 1,
+            comment: 1,
+            createdAt: 1,
+            user: { _id:1, username: 1, email: 1 }  // Only return necessary user fields
+          }
+        }
+      ]);
+  
+      return comments;
     } catch (error) {
       console.error("Error fetching comments:", error);
       throw error;
     }
-};
+  };
   
 
 module.exports.getCommentById = async (id) => {

@@ -110,18 +110,28 @@ module.exports.getCommentById = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 }
-
 module.exports.updateComment = async (req, res) => {
     try {
-        const comment = await postDAO.updateComment(req.params.id, req.body);
+        // Fetch the comment to verify ownership
+        const comment = await postDAO.getCommentById(req.params.id);  // You need a method to get the comment by ID
+        
         if (!comment) {
             return res.status(404).json({ message: 'Comment not found' });
         }
-        res.status(200).json(comment);
+
+        // Check if the user trying to update the comment is the owner
+        // if (comment.userId.toString() !== req.user.id.toString()) {
+        //     return res.status(403).json({ message: 'You are not authorized to update this comment' });
+        // }
+
+        // If user is authorized, update the comment
+        const updatedComment = await postDAO.updateComment(req.params.id, req.body);
+        res.status(200).json(updatedComment);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 }
+
 
 module.exports.deleteComment = async (req, res) => {
     try {

@@ -177,3 +177,25 @@ Base URL: `https://Infl********.com`
   - `api/users/668c2cf0fdeb45215d829c20` ,
 
 ---
+# Update Comment API
+
+## Endpoint
+
+**PUT** `/api/posts/comments/:id`
+
+## Description
+
+Updates a specific comment.
+
+## Parameters
+
+- `id` (path parameter): The unique identifier of the comment to be updated.
+
+## Request Body
+
+The request body should be a JSON object containing the fields to update. The fields that can be updated depend on the application's requirements. Example:
+
+```json
+{
+  "comment": "Updated comment text"
+}

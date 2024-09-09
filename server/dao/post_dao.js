@@ -1,6 +1,7 @@
 
 const PostModel = require('../models/post_model');
 const CommentModel = require('../models/comment_model');
+const { default: mongoose } = require('mongoose');
 
 module.exports.createPost = async (postData) => {
     return await PostModel.create(postData);
@@ -211,26 +212,38 @@ module.exports.deletePost = async (id) => {
 module.exports.createComment = async (commentData) => {
     return await CommentModel.create(commentData);
 }
+
 module.exports.getCommentsByPostId = async (postId, currPage = 1, limit = 10) => {
     try {
       // Validate parameters
       if (!postId) throw new Error("Post ID is required");
-  
+      postId = new mongoose.Types.ObjectId(postId);
       const comments = await CommentModel.aggregate([
         {
           $match: { postId: postId }  // Match comments by postId
         },
         {
           $lookup: {
-            from: 'users',  // Collection to join (users)
-            localField: 'userId',  // Field in CommentModel
-            foreignField: '_id',  // Field in users collection
-            as: 'user'  // Output array field containing user data
+            from: 'users',  // Make sure 'users' is the correct collection name in your DB
+            localField: 'userId',  // Match using 'userId' from comment document
+            foreignField: '_id',  // Join on the '_id' field from the users collection
+            as: 'user'  // Output joined data as 'user'
           }
         },
         {
-          $unwind: '$user'  // Unwind user array to a single object
+            $unwind: {
+              path: '$user',  // Unwind the 'user' array
+              preserveNullAndEmptyArrays: true  // Ensure null values are preserved
+            }
         },
+        {
+            $lookup: {
+              from: 'portfolios',  // Make sure 'users' is the correct collection name in your DB
+              localField: 'user.portfolio',  // Match using 'userId' from comment document
+              foreignField: '_id',  // Join on the '_id' field from the users collection
+              as: 'portfolio'  // Output joined data as 'user'
+            }
+          },
         {
           $sort: { createdAt: -1 }  // Sort comments by newest
         },
@@ -245,7 +258,12 @@ module.exports.getCommentsByPostId = async (postId, currPage = 1, limit = 10) =>
             postId: 1,
             comment: 1,
             createdAt: 1,
-            user: { _id:1, username: 1, email: 1 }  // Only return necessary user fields
+            user: { 
+                _id:1,
+                name: { $concat: ['$user.firstName', ' ', '$user.lastName'] },  // Combine firstName and lastName
+                username: 1
+            } , // Only return necessary user fields
+            image:'$portfolio.image'
           }
         }
       ]);
@@ -257,7 +275,6 @@ module.exports.getCommentsByPostId = async (postId, currPage = 1, limit = 10) =>
     }
   };
   
-
 module.exports.getCommentById = async (id) => {
     return await CommentModel.findById(id);
 }

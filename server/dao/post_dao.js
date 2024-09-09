@@ -261,9 +261,9 @@ module.exports.getCommentsByPostId = async (postId, currPage = 1, limit = 10) =>
             user: { 
                 _id:1,
                 name: { $concat: ['$user.firstName', ' ', '$user.lastName'] },  // Combine firstName and lastName
-                username: 1
+                username: 1,
+                image:'$portfolio.image'
             } , // Only return necessary user fields
-            image:'$portfolio.image'
           }
         }
       ]);
